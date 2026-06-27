@@ -35,9 +35,11 @@
             </div>
 
             <div class="form-group mb-3">
-                @Html.LabelFor(model => model.Password)
-                @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Ingrese su contraseña" })
-                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                <label>Nueva contraseña (opcional)</label>
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Dejar vacío si no desea cambiarla" />
             </div>
 
             <div class="form-group mb-3">

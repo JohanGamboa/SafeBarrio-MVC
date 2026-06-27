@@ -15,7 +15,10 @@
         @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control mb-3", placeholder = "Nombre" })
         @Html.TextBoxFor(m => m.Apellido, new { @class = "form-control mb-3", placeholder = "Apellido" })
         @Html.TextBoxFor(m => m.Correo, new { @class = "form-control mb-3", type = "email", placeholder = "Correo electrónico" })
-        @Html.PasswordFor(m => m.Password, new { @class = "form-control mb-3", placeholder = "Contraseña" })
+<input type="password"
+       name="password"
+       class="form-control mb-3"
+       placeholder="Contraseña" />
         @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control mb-3", placeholder = "Teléfono" })
         @Html.TextBoxFor(m => m.Ubicacion, new { @class = "form-control mb-4", placeholder = "Dirección o sector" })
 

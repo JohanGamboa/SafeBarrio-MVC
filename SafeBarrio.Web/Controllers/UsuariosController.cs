@@ -7,6 +7,7 @@ using SafeBarrio.Web.Entities;
 using SafeBarrio.Web.Models;
 using SafeBarrio.Web.Helpers;
 
+
 namespace SafeBarrio.Web.Controllers
 {
     public class UsuariosController : Controller
@@ -22,26 +23,25 @@ namespace SafeBarrio.Web.Controllers
         // REGISTRO POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Registro(Usuario usuario)
+        public ActionResult Registro(Usuario usuario, string password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError("", "La contraseña es obligatoria.");
+                return View(usuario);
+            }
+
+            usuario.PasswordHash = PasswordHelper.HashPassword(password);
+            usuario.FechaRegistro = DateTime.Now;
+
+            ModelState.Remove("PasswordHash");
+
             if (ModelState.IsValid)
             {
-                bool correoExiste = db.Usuarios.Any(u => u.Correo == usuario.Correo);
-
-                if (correoExiste)
-                {
-                    ModelState.AddModelError("Correo", "Este correo ya está registrado.");
-                    return View(usuario);
-                }
-
-                usuario.FechaRegistro = DateTime.Now;
-
-                usuario.PasswordHash = PasswordHelper.HashPassword(usuario.PasswordHash);
                 db.Usuarios.Add(usuario);
                 db.SaveChanges();
 
-                TempData["Mensaje"] = "Cuenta creada correctamente. Ahora inicia sesión.";
-                return RedirectToAction("Login");
+                return RedirectToAction("Login", "Usuarios");
             }
 
             return View(usuario);
@@ -157,18 +157,25 @@ namespace SafeBarrio.Web.Controllers
                 return RedirectToAction("Login");
             }
 
-            if (ModelState.IsValid)
+            int idUsuario = Convert.ToInt32(Session["UsuarioId"]);
+
+            var usuarioBD = db.Usuarios.Find(idUsuario);
+
+            if (usuarioBD == null)
             {
-                db.Entry(usuario).State = EntityState.Modified;
-                db.SaveChanges();
-
-                Session["UsuarioNombre"] = usuario.Nombre;
-                Session["UsuarioCorreo"] = usuario.Correo;
-
-                return RedirectToAction("Perfil");
+                return HttpNotFound();
             }
 
-            return View(usuario);
+            usuarioBD.Nombre = usuario.Nombre;
+            usuarioBD.Apellido = usuario.Apellido;
+            usuarioBD.Telefono = usuario.Telefono;
+            usuarioBD.Ubicacion = usuario.Ubicacion;
+
+            db.SaveChanges();
+
+            Session["UsuarioNombre"] = usuarioBD.Nombre;
+
+            return RedirectToAction("Perfil");
         }
 
         // EDITAR USUARIO GET
@@ -177,6 +184,13 @@ namespace SafeBarrio.Web.Controllers
             if (Session["UsuarioId"] == null)
             {
                 return RedirectToAction("Login");
+            }
+
+            bool esAdmin = Session["EsAdmin"] != null && Convert.ToBoolean(Session["EsAdmin"]);
+
+            if (!esAdmin)
+            {
+                return RedirectToAction("Perfil");
             }
 
             var usuario = db.Usuarios.Find(id);
@@ -192,22 +206,42 @@ namespace SafeBarrio.Web.Controllers
         // EDITAR USUARIO POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Editar(Usuario usuario)
+        public ActionResult Editar(Usuario usuario, string password)
         {
             if (Session["UsuarioId"] == null)
             {
                 return RedirectToAction("Login");
             }
 
-            if (ModelState.IsValid)
-            {
-                db.Entry(usuario).State = EntityState.Modified;
-                db.SaveChanges();
+            bool esAdmin = Session["EsAdmin"] != null && Convert.ToBoolean(Session["EsAdmin"]);
 
-                return RedirectToAction("Index");
+            if (!esAdmin)
+            {
+                return RedirectToAction("Perfil");
             }
 
-            return View(usuario);
+            var usuarioBD = db.Usuarios.Find(usuario.Id);
+
+            if (usuarioBD == null)
+            {
+                return HttpNotFound();
+            }
+
+            usuarioBD.Nombre = usuario.Nombre;
+            usuarioBD.Apellido = usuario.Apellido;
+            usuarioBD.Correo = usuario.Correo;
+            usuarioBD.Telefono = usuario.Telefono;
+            usuarioBD.Ubicacion = usuario.Ubicacion;
+            usuarioBD.EsAdmin = usuario.EsAdmin;
+
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                usuarioBD.PasswordHash = PasswordHelper.HashPassword(password);
+            }
+
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         // ELIMINAR USUARIO GET
@@ -216,6 +250,13 @@ namespace SafeBarrio.Web.Controllers
             if (Session["UsuarioId"] == null)
             {
                 return RedirectToAction("Login");
+            }
+
+            bool esAdmin = Session["EsAdmin"] != null && Convert.ToBoolean(Session["EsAdmin"]);
+
+            if (!esAdmin)
+            {
+                return RedirectToAction("Perfil");
             }
 
             var usuario = db.Usuarios.Find(id);
@@ -237,6 +278,13 @@ namespace SafeBarrio.Web.Controllers
             if (Session["UsuarioId"] == null)
             {
                 return RedirectToAction("Login");
+            }
+
+            bool esAdmin = Session["EsAdmin"] != null && Convert.ToBoolean(Session["EsAdmin"]);
+
+            if (!esAdmin)
+            {
+                return RedirectToAction("Perfil");
             }
 
             var usuario = db.Usuarios.Find(id);

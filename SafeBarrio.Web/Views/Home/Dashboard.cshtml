@@ -1,0 +1,218 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    var incidentesMapaJson = Json.Encode(ViewBag.IncidentesMapa);
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    #map {
+        height: 420px;
+        width: 100%;
+        border-radius: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.20);
+    }
+
+    .alert-box {
+        background: #f1f1f1;
+        border-radius: 18px;
+        padding: 12px;
+        margin-bottom: 12px;
+        font-weight: bold;
+    }
+
+    .dashboard-action {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+    }
+
+        .dashboard-action:hover {
+            opacity: .9;
+            text-decoration: none;
+        }
+
+    .sos-screen-alert {
+        background: #e64b5d;
+        color: white;
+        border-radius: 25px;
+        padding: 18px;
+        margin-bottom: 18px;
+        font-weight: bold;
+        box-shadow: 0 8px 20px rgba(0,0,0,.25);
+        animation: pulseSOS 1.2s infinite;
+    }
+
+    @@keyframes pulseSOS {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.02);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>
+
+@if (ViewBag.UltimosSOS != null && ViewBag.UltimosSOS.Count > 0)
+{
+    <div class="sos-screen-alert text-center">
+        🚨 ALERTA SOS RECIENTE DETECTADA EN LA COMUNIDAD 🚨
+        <br />
+        Revisa las alertas recientes en el panel derecho.
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2><strong>Sistema de Seguridad Comunitaria</strong></h2>
+
+        <div class="safe-card">
+            <div id="map"></div>
+
+            <button onclick="centrarUbicacion()" class="btn btn-safe mt-3">
+                Mi ubicación
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-3 d-flex flex-column justify-content-center gap-4">
+        <a href="@Url.Action("SOS", "Emergencias")" class="btn-sos dashboard-action">
+            Emergencia SOS
+        </a>
+
+        <a href="@Url.Action("Reportar", "Incidentes")" class="btn-report dashboard-action">
+            Reportar Incidente
+        </a>
+
+        <a href="@Url.Action("Chat", "Asistencia")" class="btn-assist dashboard-action">
+            Asistencia Rápida
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <h4><strong>Alertas Recientes</strong></h4>
+
+        @if (ViewBag.UltimosSOS != null)
+        {
+            foreach (var sos in ViewBag.UltimosSOS)
+            {
+                <div class="alert alert-danger fw-bold">
+                    🚨 SOS ACTIVO<br />
+                    Ubicación: @sos.Latitud, @sos.Longitud<br />
+                    Hora: @sos.FechaAlerta.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            }
+        }
+
+        @if (ViewBag.UltimosIncidentes != null)
+        {
+            foreach (var inc in ViewBag.UltimosIncidentes)
+            {
+                <div class="alert-box">
+                    🔴 @inc.TipoIncidente<br />
+                    @inc.DireccionReferencia<br />
+                    <small>@inc.FechaReporte.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+            }
+        }
+
+        <div class="alert-box">🔴 Zona de atención: Quitumbe</div>
+        <div class="alert-box">🟠 Zona de cuidado: Solanda</div>
+        <div class="alert-box">🟡 Zona con reportes: La Mariscal</div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([-0.2299, -78.5249], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var marcadorUsuario;
+
+    var zonasRiesgo = [
+        { nombre: "Quitumbe - Riesgo Alto", lat: -0.2917, lng: -78.5461, color: "red" },
+        { nombre: "Solanda - Riesgo Alto", lat: -0.2464, lng: -78.5296, color: "red" },
+        { nombre: "La Mariscal - Riesgo Alto", lat: -0.2021, lng: -78.4900, color: "red" },
+        { nombre: "Nueva Aurora - Riesgo Alto", lat: -0.3196, lng: -78.5495, color: "red" },
+        { nombre: "Calderón - Riesgo Alto", lat: -0.0964, lng: -78.4248, color: "red" },
+
+        { nombre: "Villaflora - Riesgo Medio", lat: -0.2495, lng: -78.5228, color: "orange" },
+        { nombre: "Chillogallo - Riesgo Medio", lat: -0.2637, lng: -78.5553, color: "orange" },
+        { nombre: "El Recreo - Riesgo Medio", lat: -0.2505, lng: -78.5222, color: "orange" },
+        { nombre: "Centro Histórico - Riesgo Medio", lat: -0.2201, lng: -78.5123, color: "orange" },
+        { nombre: "Av. Amazonas - Riesgo Medio", lat: -0.1856, lng: -78.4872, color: "orange" },
+
+        { nombre: "Parque La Carolina - Punto Seguro", lat: -0.1807, lng: -78.4678, color: "green" },
+        { nombre: "Parque Bicentenario - Punto Seguro", lat: -0.1427, lng: -78.4883, color: "green" },
+        { nombre: "Parque Metropolitano Guangüiltagua - Punto Seguro", lat: -0.1769, lng: -78.4547, color: "green" },
+        { nombre: "Plaza Foch / zona turística - Cuidado", lat: -0.2026, lng: -78.4916, color: "orange" }
+    ];
+
+    zonasRiesgo.forEach(function (zona) {
+        L.circle([zona.lat, zona.lng], {
+            color: zona.color,
+            fillColor: zona.color,
+            fillOpacity: 0.35,
+            radius: 520
+        }).addTo(map).bindPopup(zona.nombre);
+    });
+
+    var incidentesReportados = @Html.Raw(incidentesMapaJson ?? "[]");
+
+    incidentesReportados.forEach(function (inc) {
+        if (inc.lat && inc.lng) {
+            L.marker([inc.lat, inc.lng])
+                .addTo(map)
+                .bindPopup(
+                    "<strong>🚨 Reporte ciudadano</strong><br>" +
+                    inc.tipo + "<br>" +
+                    inc.referencia + "<br>" +
+                    inc.descripcion
+                );
+
+            L.circle([inc.lat, inc.lng], {
+                color: "red",
+                fillColor: "red",
+                fillOpacity: 0.22,
+                radius: 300
+            }).addTo(map);
+        }
+    });
+
+    function centrarUbicacion() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                map.setView([lat, lng], 16);
+
+                if (marcadorUsuario) {
+                    map.removeLayer(marcadorUsuario);
+                }
+
+                marcadorUsuario = L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup("📍 Estás aquí")
+                    .openPopup();
+
+            }, function () {
+                alert("No se pudo obtener tu ubicación. Revisa los permisos del navegador.");
+            });
+        } else {
+            alert("Tu navegador no soporta geolocalización.");
+        }
+    }
+
+    centrarUbicacion();
+</script>

@@ -1,0 +1,181 @@
+﻿@model SafeBarrio.Web.Entities.Incidente
+
+@{
+    ViewBag.Title = "Reportar Incidente";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    #mapaReporte {
+        height: 350px;
+        width: 100%;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="safe-card mx-auto" style="max-width:950px;">
+    <h2 class="text-center mb-4">Reportar Incidente</h2>
+
+    @using (Html.BeginForm("Reportar", "Incidentes", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+        <input type="hidden" id="Latitud" name="Latitud" value="0" />
+        <input type="hidden" id="Longitud" name="Longitud" value="0" />
+
+        <label>Tipo de incidente</label>
+        @Html.DropDownListFor(m => m.TipoIncidente,
+            new SelectList(new[]
+            {
+                "Robo",
+                "Asalto",
+                "Violencia",
+                "Accidente",
+                "Emergencia médica",
+                "Incendio",
+                "Otro"
+            }),
+            "Seleccione una opción",
+            new { @class = "form-control mb-3" })
+
+        <label>Descripción del suceso</label>
+        @Html.TextAreaFor(m => m.Descripcion,
+            new { @class = "form-control mb-3", rows = 4, placeholder = "Describe qué ocurrió..." })
+
+        <label>Dirección o referencia</label>
+        <div class="input-group mb-3">
+            @Html.TextBoxFor(m => m.DireccionReferencia,
+                new { @class = "form-control", id = "DireccionReferencia", placeholder = "Ejemplo: San Roque, Quito" })
+
+            <button type="button" onclick="buscarDireccion()" class="btn btn-secondary">
+                Buscar
+            </button>
+        </div>
+
+        <label>Selecciona la ubicación en el mapa</label>
+        <div id="mapaReporte"></div>
+
+        <button type="button" onclick="usarMiUbicacion()" class="btn btn-secondary mb-3">
+            Usar mi ubicación actual
+        </button>
+
+        <div class="alert alert-info">
+            Latitud seleccionada: <span id="latTexto">No seleccionada</span><br />
+            Longitud seleccionada: <span id="lngTexto">No seleccionada</span>
+        </div>
+
+        <label>Adjuntar evidencia</label>
+        <input type="file" name="imagenEvidencia" class="form-control mb-4" accept="image/*" />
+
+        <button type="submit" class="btn btn-safe w-100">
+            Publicar Reporte
+        </button>
+    }
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var mapa = L.map('mapaReporte').setView([-0.2299, -78.5249], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+
+    var marcador;
+
+    function colocarMarcador(lat, lng) {
+        lat = parseFloat(lat);
+        lng = parseFloat(lng);
+
+        document.getElementById("Latitud").value = lat.toString().replace(",", ".");
+        document.getElementById("Longitud").value = lng.toString().replace(",", ".");
+
+        document.getElementById("latTexto").innerText = lat;
+        document.getElementById("lngTexto").innerText = lng;
+
+        if (marcador) {
+            mapa.removeLayer(marcador);
+        }
+
+        marcador = L.marker([lat, lng])
+            .addTo(mapa)
+            .bindPopup("Ubicación del incidente")
+            .openPopup();
+    }
+
+    mapa.on('click', function (e) {
+        colocarMarcador(e.latlng.lat, e.latlng.lng);
+    });
+
+    function usarMiUbicacion() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                mapa.setView([position.coords.latitude, position.coords.longitude], 16);
+                colocarMarcador(position.coords.latitude, position.coords.longitude);
+            }, function () {
+                alert("No se pudo obtener tu ubicación.");
+            });
+        }
+    }
+
+    function buscarDireccion() {
+        var direccion = document.getElementById("DireccionReferencia").value.toLowerCase();
+
+        if (direccion.trim() === "") {
+            alert("Escribe una dirección o sector.");
+            return;
+        }
+
+        var zonasQuito = {
+            "villaflora": [-0.2495, -78.5228],
+            "la villaflora": [-0.2495, -78.5228],
+            "san roque": [-0.2219, -78.5204],
+            "la recoleta": [-0.2292, -78.5138],
+            "recoleta": [-0.2292, -78.5138],
+            "solanda": [-0.2464, -78.5296],
+            "quitumbe": [-0.2917, -78.5461],
+            "chillogallo": [-0.2637, -78.5553],
+            "el recreo": [-0.2505, -78.5222],
+            "la mariscal": [-0.2021, -78.4900],
+            "centro historico": [-0.2201, -78.5123],
+            "centro histórico": [-0.2201, -78.5123],
+            "calderon": [-0.0964, -78.4248],
+            "calderón": [-0.0964, -78.4248]
+        };
+
+        for (var zona in zonasQuito) {
+            if (direccion.includes(zona)) {
+                var coords = zonasQuito[zona];
+                mapa.setView(coords, 16);
+                colocarMarcador(coords[0], coords[1]);
+                return;
+            }
+        }
+
+        var consulta = direccion + ", Quito, Ecuador";
+        var url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(consulta);
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    var lat = parseFloat(data[0].lat);
+                    var lng = parseFloat(data[0].lon);
+
+                    mapa.setView([lat, lng], 16);
+                    colocarMarcador(lat, lng);
+                } else {
+                    alert("No se encontró la dirección. Intenta escribir otra referencia.");
+                }
+            })
+            .catch(error => {
+                alert("No se pudo buscar la dirección.");
+            });
+    }
+</script>

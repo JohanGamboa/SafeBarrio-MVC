@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Inicio";
+}
+
+<div class="text-center">
+
+    <img src="~/Content/Images/logo-safebarrio.png"
+         style="width:260px; margin-top:20px;" />
+
+    <h1 style="font-size:85px; font-weight:900; margin-top:15px;">
+        SEGURIDAD
+    </h1>
+
+    <h2 style="margin-bottom:30px;">
+        CUIDA TU INTEGRIDAD
+    </h2>
+
+    <div style="max-width:850px; margin:auto; color:white; font-size:18px;">
+        SafeBarrio es una plataforma de seguridad ciudadana que permite
+        reportar incidentes, visualizar zonas de riesgo, recibir alertas
+        comunitarias y solicitar ayuda de manera rápida.
+    </div>
+
+    <div style="margin-top:40px;">
+        @Html.ActionLink(
+            "Iniciar Sesión",
+            "Login",
+            "Usuarios",
+            null,
+            new { @class = "btn btn-safe" }
+        )
+
+        @Html.ActionLink(
+            "Crear Cuenta",
+            "Registro",
+            "Usuarios",
+            null,
+            new { @class = "btn btn-safe ms-3" }
+        )
+    </div>
+
+</div>

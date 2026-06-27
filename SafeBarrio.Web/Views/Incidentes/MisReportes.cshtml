@@ -1,0 +1,50 @@
+﻿@model IEnumerable<SafeBarrio.Web.Entities.Incidente>
+
+@{
+    ViewBag.Title = "Mis Reportes";
+}
+
+<div class="safe-card">
+    <h2 class="mb-4">Mis Reportes de Incidentes</h2>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">@TempData["Mensaje"]</div>
+    }
+
+    <p>
+        @Html.ActionLink("Reportar nuevo incidente", "Reportar", "Incidentes", null, new { @class = "btn btn-safe" })
+    </p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Aún no tienes reportes registrados.
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(item.ImagenRuta))
+                        {
+                            <img src="@item.ImagenRuta" class="img-fluid rounded mb-3" />
+                        }
+
+                        <h5><strong>@item.TipoIncidente</strong></h5>
+                        <p>@item.Descripcion</p>
+                        <p><strong>Referencia:</strong> @item.DireccionReferencia</p>
+                        <p><strong>Estado:</strong> @item.Estado</p>
+                        <p><strong>Fecha:</strong> @item.FechaReporte.ToString("dd/MM/yyyy HH:mm")</p>
+
+                        @Html.ActionLink("Editar", "Editar", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" })
+                        @Html.ActionLink("Eliminar", "Eliminar", new { id = item.Id }, new { @class = "btn btn-danger btn-sm ms-2" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

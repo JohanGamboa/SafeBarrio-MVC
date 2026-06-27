@@ -1,0 +1,64 @@
+﻿@model SafeBarrio.Web.Entities.Usuario
+
+@{
+    ViewBag.Title = "Editar Usuario";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <h2 class="text-center mb-4">Editar Usuario</h2>
+
+        @using (Html.BeginForm("Editar", "Usuarios", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.FechaRegistro)
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Nombre)
+                @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", placeholder = "Ingrese su nombre" })
+                @Html.ValidationMessageFor(model => model.Nombre, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Apellido)
+                @Html.TextBoxFor(model => model.Apellido, new { @class = "form-control", placeholder = "Ingrese su apellido" })
+                @Html.ValidationMessageFor(model => model.Apellido, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Correo)
+                @Html.TextBoxFor(model => model.Correo, new { @class = "form-control", type = "email", placeholder = "ejemplo@correo.com" })
+                @Html.ValidationMessageFor(model => model.Correo, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Password)
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Ingrese su contraseña" })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Telefono)
+                @Html.TextBoxFor(model => model.Telefono, new { @class = "form-control", placeholder = "Ingrese su teléfono" })
+                @Html.ValidationMessageFor(model => model.Telefono, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-4">
+                @Html.LabelFor(model => model.Ubicacion)
+                @Html.TextBoxFor(model => model.Ubicacion, new { @class = "form-control", placeholder = "Ingrese su ubicación" })
+                @Html.ValidationMessageFor(model => model.Ubicacion, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100">
+                Guardar Cambios
+            </button>
+        }
+
+        <div class="text-center mt-3">
+            @Html.ActionLink("Volver al listado", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+</div>

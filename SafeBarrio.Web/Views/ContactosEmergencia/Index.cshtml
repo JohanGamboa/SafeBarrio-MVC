@@ -1,0 +1,30 @@
+﻿@model IEnumerable<SafeBarrio.Web.Entities.ContactoEmergencia>
+
+@{
+    ViewBag.Title = "Contactos de Emergencia";
+}
+
+<div class="safe-card">
+    <h2>Contactos de Emergencia</h2>
+    <p>Estos contactos serán usados cuando actives una alerta SOS.</p>
+
+    @Html.ActionLink("Agregar Contacto", "Crear", null, new { @class = "btn btn-safe mb-3" })
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body">
+                        <h5><strong>@item.Nombre</strong></h5>
+                        <p><strong>Teléfono:</strong> @item.Telefono</p>
+                        <p><strong>Parentesco:</strong> @item.Parentesco</p>
+
+                        @Html.ActionLink("Editar", "Editar", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" })
+                        @Html.ActionLink("Eliminar", "Eliminar", new { id = item.Id }, new { @class = "btn btn-danger btn-sm ms-2" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

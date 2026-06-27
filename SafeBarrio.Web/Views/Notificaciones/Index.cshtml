@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SafeBarrio.Web.Entities.Notificacion>
+
+@{
+    ViewBag.Title = "Notificaciones";
+}
+
+<div class="safe-card">
+    <h2 class="mb-4">🔔 Centro de Notificaciones</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No tienes notificaciones por el momento.
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <div class="card mb-3 shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5><strong>@item.Titulo</strong></h5>
+                    <p>@item.Mensaje</p>
+                    <small class="text-muted">
+                        @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                    </small>
+                </div>
+            </div>
+        }
+    }
+</div>v>

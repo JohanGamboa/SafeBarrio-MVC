@@ -1,0 +1,32 @@
+﻿@model SafeBarrio.Web.Entities.Incidente
+
+@{
+    ViewBag.Title = "Eliminar Reporte";
+}
+
+<div class="safe-card mx-auto text-center" style="max-width:700px;">
+    <h2 class="mb-3">Eliminar Reporte</h2>
+
+    <p class="mb-4">
+        ¿Seguro que deseas eliminar este reporte de incidente?
+    </p>
+
+    <div class="alert alert-warning text-start">
+        <h5><strong>@Model.TipoIncidente</strong></h5>
+        <p><strong>Descripción:</strong> @Model.Descripcion</p>
+        <p><strong>Referencia:</strong> @Model.DireccionReferencia</p>
+        <p><strong>Fecha:</strong> @Model.FechaReporte.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Estado:</strong> @Model.Estado</p>
+    </div>
+
+    @using (Html.BeginForm("Eliminar", "Incidentes", new { id = Model.Id }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+
+        @Html.ActionLink("Cancelar", "MisReportes", null, new { @class = "btn btn-secondary ms-2" })
+    }
+</div>

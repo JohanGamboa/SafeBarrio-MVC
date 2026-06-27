@@ -1,0 +1,51 @@
+﻿@model IEnumerable<SafeBarrio.Web.Entities.Usuario>
+
+@{
+    ViewBag.Title = "Usuarios";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Usuarios registrados</h3>
+        </div>
+
+        <div class="card-body">
+            <p>
+                @Html.ActionLink("Registrar nuevo usuario", "Registro", null, new { @class = "btn btn-success" })
+            </p>
+
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Ubicación</th>
+                        <th>Fecha registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Apellido</td>
+                            <td>@item.Correo</td>
+                            <td>@item.Telefono</td>
+                            <td>@item.Ubicacion</td>
+                            <td>@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @Html.ActionLink("Editar", "Editar", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" })
+                                @Html.ActionLink("Eliminar","Eliminar",new { id = item.Id },new { @class = "btn btn-danger btn-sm" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

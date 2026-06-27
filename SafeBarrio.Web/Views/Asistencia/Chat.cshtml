@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Asistencia Rápida";
+}
+
+<div class="safe-card mx-auto" style="max-width:850px;">
+    <h2 class="text-center mb-4">🤖 Asistencia Rápida SafeBarrio</h2>
+
+    <div id="chatBox" style="height:350px; overflow-y:auto; background:#f4f4f4; border-radius:20px; padding:20px; margin-bottom:20px;">
+        <div class="alert alert-primary">
+            Hola, soy tu asistente de seguridad. Puedes preguntarme qué hacer ante un robo, emergencia o zona peligrosa.
+        </div>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="mensajeUsuario" class="form-control" placeholder="Escribe tu pregunta..." />
+        <button onclick="enviarMensaje()" class="btn btn-safe">Enviar</button>
+    </div>
+</div>
+
+<script>
+    function enviarMensaje() {
+        var mensaje = document.getElementById("mensajeUsuario").value;
+
+        if (mensaje.trim() === "") {
+            return;
+        }
+
+        var chatBox = document.getElementById("chatBox");
+
+        chatBox.innerHTML +=
+            '<div class="alert alert-success text-end"><strong>Tú:</strong> ' + mensaje + '</div>';
+
+        fetch('@Url.Action("Responder", "Asistencia")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mensaje: mensaje })
+        })
+        .then(response => response.json())
+        .then(data => {
+            chatBox.innerHTML +=
+                '<div class="alert alert-primary"><strong>SafeBot:</strong> ' + data.respuesta + '</div>';
+
+            document.getElementById("mensajeUsuario").value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    }
+</script>

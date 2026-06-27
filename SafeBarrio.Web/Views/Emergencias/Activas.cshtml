@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SafeBarrio.Web.Entities.AlertaSOS>
+
+@{
+    ViewBag.Title = "Alertas SOS";
+}
+
+<div class="safe-card">
+    <h2>🚨 Alertas SOS</h2>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body">
+                        <h5><strong>Alerta SOS</strong></h5>
+                        <p><strong>Estado:</strong> @item.Estado</p>
+                        <p><strong>Ubicación:</strong> @item.Latitud, @item.Longitud</p>
+                        <p><strong>Fecha:</strong> @item.FechaAlerta.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p>@item.Mensaje</p>
+
+                        @if (item.Estado == "Activa")
+                        {
+                            @Html.ActionLink("Marcar como resuelta", "Resolver", new { id = item.Id }, new { @class = "btn btn-success btn-sm" })
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

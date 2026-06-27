@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Panel Administrador";
+}
+
+<div class="safe-card">
+    <h2 class="mb-4">Panel Administrador SafeBarrio</h2>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="alert alert-primary">
+                <h3>@ViewBag.TotalUsuarios</h3>
+                Usuarios
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="alert alert-warning">
+                <h3>@ViewBag.TotalIncidentes</h3>
+                Incidentes
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="alert alert-danger">
+                <h3>@ViewBag.TotalSOSActivos</h3>
+                SOS Activos
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="alert alert-success">
+                <h3>@ViewBag.TotalSOSResueltos</h3>
+                SOS Resueltos
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        @Html.ActionLink("Gestionar Usuarios", "Index", "Usuarios", null, new { @class = "btn btn-safe" })
+        @Html.ActionLink("Ver Incidentes", "Todos", "Incidentes", null, new { @class = "btn btn-warning ms-2" })
+        @Html.ActionLink("Ver Alertas SOS", "Activas", "Emergencias", null, new { @class = "btn btn-danger ms-2" })
+    </div>
+
+    <h4>Últimos Incidentes</h4>
+
+    @foreach (var inc in ViewBag.UltimosIncidentes)
+    {
+        <div class="alert alert-secondary">
+            <strong>@inc.TipoIncidente</strong> - @inc.DireccionReferencia <br />
+            <small>@inc.FechaReporte.ToString("dd/MM/yyyy HH:mm")</small>
+        </div>
+    }
+
+    <h4 class="mt-4">Últimas Alertas SOS</h4>
+
+    @foreach (var sos in ViewBag.UltimosSOS)
+    {
+        <div class="alert alert-danger">
+            <strong>@sos.Estado</strong> - @sos.Latitud, @sos.Longitud <br />
+            <small>@sos.FechaAlerta.ToString("dd/MM/yyyy HH:mm")</small>
+        </div>
+    }
+</div>

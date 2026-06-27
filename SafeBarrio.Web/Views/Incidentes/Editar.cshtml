@@ -1,0 +1,65 @@
+﻿@model SafeBarrio.Web.Entities.Incidente
+
+@{
+    ViewBag.Title = "Editar Reporte";
+}
+
+<div class="safe-card mx-auto" style="max-width:750px;">
+    <h2 class="text-center mb-4">Editar Reporte</h2>
+
+    @using (Html.BeginForm("Editar", "Incidentes", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.UsuarioId)
+        @Html.HiddenFor(m => m.FechaReporte)
+        @Html.HiddenFor(m => m.Estado)
+        @Html.HiddenFor(m => m.Latitud)
+        @Html.HiddenFor(m => m.Longitud)
+        @Html.HiddenFor(m => m.ImagenRuta)
+
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+        if (!string.IsNullOrEmpty(Model.ImagenRuta))
+        {
+            <div class="text-center mb-3">
+                <p><strong>Evidencia actual</strong></p>
+                <img src="@Model.ImagenRuta"
+                     class="img-fluid rounded"
+                     style="max-height:250px; object-fit:cover;" />
+            </div>
+        }
+
+        <label>Tipo de incidente</label>
+        @Html.DropDownListFor(m => m.TipoIncidente,
+            new SelectList(new[]
+            {
+                "Robo",
+                "Asalto",
+                "Violencia",
+                "Accidente",
+                "Emergencia médica",
+                "Incendio",
+                "Otro"
+            }, Model.TipoIncidente),
+            new { @class = "form-control mb-3" })
+
+        <label>Descripción</label>
+        @Html.TextAreaFor(m => m.Descripcion, new { @class = "form-control mb-3", rows = 4 })
+
+        <label>Dirección o referencia</label>
+        @Html.TextBoxFor(m => m.DireccionReferencia, new { @class = "form-control mb-3" })
+
+        <label>Cambiar evidencia / foto</label>
+        <input type="file" name="imagenEvidencia" class="form-control mb-4" accept="image/*" />
+
+        <button type="submit" class="btn btn-safe w-100">
+            Guardar Cambios
+        </button>
+    }
+
+    <div class="text-center mt-3">
+        @Html.ActionLink("Volver a Mis Reportes", "MisReportes", null, new { @class = "btn btn-secondary" })
+    </div>
+</div>

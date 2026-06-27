@@ -1,0 +1,190 @@
+﻿@{
+    ViewBag.Title = "Emergencia SOS";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    #mapaSOS {
+        height: 350px;
+        width: 100%;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+
+    .sos-title {
+        color: #e64b5d;
+        font-weight: 900;
+    }
+
+    .sos-flash {
+        display: none;
+        background: #e64b5d;
+        color: white;
+        padding: 20px;
+        border-radius: 25px;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        animation: flashSOS 1s infinite;
+    }
+
+    @@keyframes flashSOS {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .45;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+
+<div id="alertaVisualSOS" class="sos-flash text-center">
+    🚨 ALERTA SOS ENVIADA 🚨
+</div>
+
+<div class="safe-card mx-auto" style="max-width:900px;">
+    <div class="text-center">
+        <h1 class="sos-title">🚨 EMERGENCIA SOS</h1>
+        <p>Este botón registra tu ubicación actual y genera una alerta de emergencia.</p>
+    </div>
+
+    <div id="mapaSOS"></div>
+
+    <div class="text-center">
+        <button onclick="enviarSOS()" class="btn-sos">
+            Enviar Alerta SOS
+        </button>
+
+        <br /><br />
+
+        <a href="tel:911" class="btn btn-danger">
+            Abrir llamada al 911
+        </a>
+
+        <p class="text-muted mt-2">
+            En computadora puede abrir una aplicación de llamadas. En celular abrirá el marcador telefónico.
+        </p>
+    </div>
+
+    <div id="mensajeSOS" class="mt-4"></div>
+    @if (ViewBag.MiSOSActivo != null)
+    {
+        <div class="alert alert-danger mt-4 text-center">
+            <h4>🚨 Tienes una alerta SOS activa</h4>
+            <p>Mientras esté activa, aparecerá como alerta reciente en el sistema.</p>
+
+            @Html.ActionLink(
+                "Finalizar mi alerta SOS",
+                "FinalizarMiSOS",
+                "Emergencias",
+                new { id = ViewBag.MiSOSActivo.Id },
+                new { @class = "btn btn-success" }
+            )
+        </div>
+    }
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var mapa = L.map('mapaSOS').setView([-0.2299, -78.5249], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+
+    var latActual = -0.2299;
+    var lngActual = -78.5249;
+    var marcador;
+
+    function mostrarUbicacion(lat, lng) {
+        latActual = lat;
+        lngActual = lng;
+
+        mapa.setView([lat, lng], 16);
+
+        if (marcador) {
+            mapa.removeLayer(marcador);
+        }
+
+        marcador = L.marker([lat, lng])
+            .addTo(mapa)
+            .bindPopup("📍 Tu ubicación actual")
+            .openPopup();
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            mostrarUbicacion(position.coords.latitude, position.coords.longitude);
+        }, function () {
+            document.getElementById("mensajeSOS").innerHTML =
+                '<div class="alert alert-warning">No se pudo obtener tu ubicación. Se usará una ubicación aproximada.</div>';
+        });
+    }
+
+    function reproducirAlarma() {
+        try {
+            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            function beep(inicio, frecuencia) {
+                var oscillator = audioContext.createOscillator();
+                var gainNode = audioContext.createGain();
+
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(frecuencia, audioContext.currentTime + inicio);
+                gainNode.gain.setValueAtTime(0.6, audioContext.currentTime + inicio);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.start(audioContext.currentTime + inicio);
+                oscillator.stop(audioContext.currentTime + inicio + 0.35);
+            }
+
+            beep(0, 900);
+            beep(0.45, 1200);
+            beep(0.90, 900);
+            beep(1.35, 1200);
+
+        } catch (e) {
+            alert("Alerta SOS enviada.");
+        }
+    }
+
+    function enviarSOS() {
+        fetch('@Url.Action("GuardarSOS", "Emergencias")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                latitud: latActual,
+                longitud: lngActual
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                document.getElementById("alertaVisualSOS").style.display = "block";
+                reproducirAlarma();
+
+                document.getElementById("mensajeSOS").innerHTML =
+                    '<div class="alert alert-success">' + data.mensaje + '</div>';
+            } else {
+                document.getElementById("mensajeSOS").innerHTML =
+                    '<div class="alert alert-danger">No se pudo enviar la alerta.</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById("mensajeSOS").innerHTML =
+                '<div class="alert alert-danger">Error al enviar la alerta SOS.</div>';
+        });
+    }
+</script>

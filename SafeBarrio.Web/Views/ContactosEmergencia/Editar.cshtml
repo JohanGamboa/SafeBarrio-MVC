@@ -1,0 +1,31 @@
+﻿@model SafeBarrio.Web.Entities.ContactoEmergencia
+
+@{
+    ViewBag.Title = "Editar Contacto";
+}
+
+<div class="safe-card mx-auto" style="max-width:700px;">
+    <h2 class="text-center mb-4">Editar Contacto</h2>
+
+    @using (Html.BeginForm("Editar", "ContactosEmergencia", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.UsuarioId)
+
+        <label>Nombre</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control mb-3" })
+
+        <label>Teléfono</label>
+        @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control mb-3" })
+
+        <label>Parentesco</label>
+        @Html.TextBoxFor(m => m.Parentesco, new { @class = "form-control mb-4" })
+
+        <button type="submit" class="btn btn-safe w-100">Guardar Cambios</button>
+    }
+
+    <div class="text-center mt-3">
+        @Html.ActionLink("Volver", "Index")
+    </div>
+</div>

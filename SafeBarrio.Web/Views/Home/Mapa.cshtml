@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Mapa";
+    var incidentesMapaJson = Json.Encode(ViewBag.IncidentesMapa);
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    #mapaGrande {
+        height: 650px;
+        width: 100%;
+        border-radius: 25px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+</style>
+
+<div class="safe-card">
+    <h2><strong>Mapa de Seguridad Comunitaria</strong></h2>
+    <p>Visualiza zonas de riesgo, puntos seguros y reportes ciudadanos recientes en Quito.</p>
+
+    <button onclick="centrarUbicacion()" class="btn btn-safe mb-3">
+        Mi ubicación
+    </button>
+
+    <div id="mapaGrande"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var mapa = L.map('mapaGrande').setView([-0.2299, -78.5249], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+
+    var marcadorUsuario;
+
+    var zonasRiesgo = [
+        { nombre: "Quitumbe - Riesgo Alto", lat: -0.2917, lng: -78.5461, color: "red" },
+        { nombre: "Solanda - Riesgo Alto", lat: -0.2464, lng: -78.5296, color: "red" },
+        { nombre: "La Mariscal - Riesgo Alto", lat: -0.2021, lng: -78.4900, color: "red" },
+        { nombre: "Nueva Aurora - Riesgo Alto", lat: -0.3196, lng: -78.5495, color: "red" },
+        { nombre: "Calderón - Riesgo Alto", lat: -0.0964, lng: -78.4248, color: "red" },
+
+        { nombre: "Villaflora - Riesgo Medio", lat: -0.2495, lng: -78.5228, color: "orange" },
+        { nombre: "Chillogallo - Riesgo Medio", lat: -0.2637, lng: -78.5553, color: "orange" },
+        { nombre: "El Recreo - Riesgo Medio", lat: -0.2505, lng: -78.5222, color: "orange" },
+        { nombre: "Centro Histórico - Riesgo Medio", lat: -0.2201, lng: -78.5123, color: "orange" },
+        { nombre: "Av. Amazonas - Riesgo Medio", lat: -0.1856, lng: -78.4872, color: "orange" },
+
+        { nombre: "Parque La Carolina - Punto Seguro", lat: -0.1807, lng: -78.4678, color: "green" },
+        { nombre: "Parque Bicentenario - Punto Seguro", lat: -0.1427, lng: -78.4883, color: "green" },
+        { nombre: "Parque Metropolitano Guangüiltagua - Punto Seguro", lat: -0.1769, lng: -78.4547, color: "green" }
+    ];
+
+    zonasRiesgo.forEach(function (zona) {
+        L.circle([zona.lat, zona.lng], {
+            color: zona.color,
+            fillColor: zona.color,
+            fillOpacity: 0.35,
+            radius: 600
+        }).addTo(mapa).bindPopup(zona.nombre);
+    });
+
+    var incidentesReportados = @Html.Raw(incidentesMapaJson ?? "[]");
+
+    incidentesReportados.forEach(function (inc) {
+        if (inc.lat && inc.lng) {
+            L.marker([inc.lat, inc.lng])
+                .addTo(mapa)
+                .bindPopup(
+                    "<strong>🚨 Reporte ciudadano</strong><br>" +
+                    inc.tipo + "<br>" +
+                    inc.referencia + "<br>" +
+                    inc.descripcion
+                );
+
+            L.circle([inc.lat, inc.lng], {
+                color: "red",
+                fillColor: "red",
+                fillOpacity: 0.22,
+                radius: 350
+            }).addTo(mapa);
+        }
+    });
+
+    function centrarUbicacion() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                mapa.setView([lat, lng], 16);
+
+                if (marcadorUsuario) {
+                    mapa.removeLayer(marcadorUsuario);
+                }
+
+                marcadorUsuario = L.marker([lat, lng])
+                    .addTo(mapa)
+                    .bindPopup("📍 Estás aquí")
+                    .openPopup();
+
+            }, function () {
+                alert("No se pudo obtener tu ubicación.");
+            });
+        }
+    }
+
+    centrarUbicacion();
+</script>

@@ -1,0 +1,24 @@
+﻿@model SafeBarrio.Web.Entities.ContactoEmergencia
+
+@{
+    ViewBag.Title = "Eliminar Contacto";
+}
+
+<div class="safe-card mx-auto text-center" style="max-width:650px;">
+    <h2>Eliminar Contacto</h2>
+    <p>¿Seguro que deseas eliminar este contacto de emergencia?</p>
+
+    <div class="alert alert-warning">
+        <strong>@Model.Nombre</strong><br />
+        Teléfono: @Model.Telefono<br />
+        Parentesco: @Model.Parentesco
+    </div>
+
+    @using (Html.BeginForm("Eliminar", "ContactosEmergencia", new { id = Model.Id }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-secondary ms-2" })
+    }
+</div>

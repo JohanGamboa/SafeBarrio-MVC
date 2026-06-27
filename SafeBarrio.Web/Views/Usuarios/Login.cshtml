@@ -1,0 +1,59 @@
+﻿@model SafeBarrio.Web.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="safe-card mx-auto" style="max-width:600px;">
+
+    <div class="text-center">
+
+        <img src="~/Content/Images/logo-safebarrio.png"
+             style="width:200px;" />
+
+        <h2>Iniciar Sesión</h2>
+
+    </div>
+
+    <br />
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Mensaje"]
+        </div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    @using (Html.BeginForm())
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <label>Correo electrónico</label>
+        @Html.TextBoxFor(m => m.Correo,
+            new
+            {
+                @class = "form-control mb-3",
+                placeholder = "ejemplo@gmail.com"
+            })
+
+        <label>Contraseña</label>
+        @Html.PasswordFor(m => m.Password,
+            new
+            {
+                @class = "form-control mb-4",
+                placeholder = "Ingrese su contraseña"
+            })
+
+        <button type="submit" class="btn btn-safe w-100">
+            Iniciar Sesión
+        </button>
+    }
+
+</div>

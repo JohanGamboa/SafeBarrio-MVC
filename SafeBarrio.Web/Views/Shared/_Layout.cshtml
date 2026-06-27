@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@ViewBag.Title - SafeBarrio</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom, #f5f7fa 0%, #ffffff 45%, #1f2f2f 100%);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .safe-navbar {
+            margin: 22px auto 0 auto;
+            width: 92%;
+            border-radius: 25px;
+            background: #1d3148;
+            padding: 10px 22px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.18);
+        }
+
+        .safe-brand {
+            color: white !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .safe-brand:hover {
+                color: #9ccc22 !important;
+            }
+
+        .safe-link {
+            color: white !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 22px;
+            text-decoration: none;
+        }
+
+            .safe-link:hover {
+                color: #9ccc22 !important;
+            }
+
+        .safe-user {
+            color: #9ccc22 !important;
+            font-weight: bold;
+            margin-left: 22px;
+            text-transform: uppercase;
+        }
+
+        .safe-content {
+            width: 92%;
+            margin: 25px auto;
+        }
+
+        .safe-card {
+            background: rgba(255,255,255,.94);
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.20);
+            padding: 28px;
+        }
+
+        .btn-safe {
+            background: #82a914;
+            color: white;
+            border-radius: 25px;
+            padding: 12px 35px;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+            .btn-safe:hover {
+                background: #6f9410;
+                color: white;
+            }
+
+        .btn-sos {
+            background: #e64b5d;
+            color: black;
+            border-radius: 30px;
+            padding: 18px 35px;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-report {
+            background: #d3b52c;
+            color: black;
+            border-radius: 30px;
+            padding: 18px 35px;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-assist {
+            background: #4a78ae;
+            color: black;
+            border-radius: 30px;
+            padding: 18px 35px;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        footer {
+            color: white;
+            text-align: center;
+            padding: 25px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm safe-navbar">
+        <div class="container-fluid">
+            @if (Session["UsuarioId"] == null)
+            {
+                @Html.ActionLink("🛡 SAFEBARRIO", "Index", "Home", new { area = "" }, new { @class = "safe-brand" })
+            }
+            else
+            {
+                @Html.ActionLink("🛡 SAFEBARRIO", "Dashboard", "Home", new { area = "" }, new { @class = "safe-brand" })
+            }
+
+            <button type="button" class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    @if (Session["UsuarioId"] == null)
+                    {
+                        <li>@Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Iniciar Sesión", "Login", "Usuarios", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Crear Cuenta", "Registro", "Usuarios", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Soporte", "Soporte", "Home", null, new { @class = "safe-link" })</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Inicio", "Dashboard", "Home", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Mapa", "Mapa", "Home", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Mis Reportes", "MisReportes", "Incidentes", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Notificaciones", "Index", "Notificaciones", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Perfil", "Perfil", "Usuarios", null, new { @class = "safe-link" })</li>
+                        <li>@Html.ActionLink("Contactos", "Index", "ContactosEmergencia", null, new { @class = "safe-link" })</li>
+
+                        if (Session["EsAdmin"] != null && Convert.ToBoolean(Session["EsAdmin"]))
+                        {
+                            <li>@Html.ActionLink("Usuarios", "Index", "Usuarios", null, new { @class = "safe-link" })</li>
+                            <li>@Html.ActionLink("Incidentes", "Todos", "Incidentes", null, new { @class = "safe-link" })</li>
+                            <li>@Html.ActionLink("Admin", "Dashboard", "Admin", null, new { @class = "safe-link" })</li>
+                        }
+
+                        <li class="safe-user">
+                            👤 @Session["UsuarioNombre"]
+                        </li>
+
+                        <li>@Html.ActionLink("Salir", "CerrarSesion", "Usuarios", null, new { @class = "safe-link" })</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="safe-content">
+        @RenderBody()
+    </main>
+
+    <footer>
+        WWW.SAFEBARRIO.COM
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

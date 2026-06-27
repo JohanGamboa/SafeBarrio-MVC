@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Soporte";
+}
+
+<div class="safe-card mx-auto" style="max-width:850px;">
+    <div class="text-center mb-4">
+        <img src="~/Content/Images/logo-safebarrio.png" style="width:170px;" />
+        <h2 class="mt-3">Centro de Soporte</h2>
+        <p>Ayuda rápida para usar SafeBarrio correctamente.</p>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>¿Qué es SafeBarrio?</strong><br />
+        Es una plataforma de seguridad comunitaria que permite reportar incidentes,
+        enviar alertas SOS, revisar zonas de riesgo y recibir notificaciones.
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>¿Cómo reportar un incidente?</strong><br />
+        Inicia sesión, entra a “Reportar Incidente”, selecciona el tipo de problema,
+        escribe una descripción, marca la ubicación en el mapa y publica el reporte.
+    </div>
+
+    <div class="alert alert-danger">
+        <strong>¿Qué hago en una emergencia?</strong><br />
+        Usa el botón SOS para registrar tu ubicación. Si estás en peligro real,
+        llama directamente al 911.
+    </div>
+
+    <div class="alert alert-success">
+        <strong>Contacto de soporte:</strong><br />
+        soporte@safebarrio.com<br />
+        Horario de atención: lunes a viernes, 08h00 - 18h00
+    </div>
+
+    <div class="text-center mt-4">
+        @Html.ActionLink("Volver al inicio", "Index", "Home", null, new { @class = "btn btn-safe" })
+    </div>
+</div>

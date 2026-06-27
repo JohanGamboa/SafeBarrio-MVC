@@ -1,0 +1,68 @@
+﻿@model SafeBarrio.Web.Entities.Usuario
+
+@{
+    ViewBag.Title = "Perfil";
+}
+
+<div class="safe-card mx-auto" style="max-width:900px;">
+
+    <div class="text-center">
+
+        <img src="~/Content/Images/logo-safebarrio.png"
+             style="width:180px;" />
+
+        <h2>Mi Perfil</h2>
+
+    </div>
+
+    <hr />
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <label><strong>Nombre</strong></label>
+            <input class="form-control" value="@Model.Nombre" readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label><strong>Apellido</strong></label>
+            <input class="form-control" value="@Model.Apellido" readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label><strong>Correo</strong></label>
+            <input class="form-control" value="@Model.Correo" readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label><strong>Teléfono</strong></label>
+            <input class="form-control" value="@Model.Telefono" readonly />
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <label><strong>Dirección</strong></label>
+            <input class="form-control" value="@Model.Ubicacion" readonly />
+        </div>
+
+        <div class="col-md-12 mb-4">
+            <label><strong>Fecha Registro</strong></label>
+            <input class="form-control"
+                   value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")"
+                   readonly />
+        </div>
+
+    </div>
+
+    <div class="text-center">
+
+        @Html.ActionLink(
+            "Editar Perfil",
+            "EditarPerfil",
+            "Usuarios",
+            null,
+            new { @class = "btn btn-safe" }
+        )
+
+    </div>
+
+</div>
